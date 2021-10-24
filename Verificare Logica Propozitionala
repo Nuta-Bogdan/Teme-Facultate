@@ -1,0 +1,93 @@
+def eval_prop (s):
+   
+    prop=[]
+    for i in s:
+        if i!=" ":
+            prop.append(i)
+    #formarea input-ului intr-o lista
+    #pentru a putea sa o prelucram
+
+    alphabet=["Q","W","E","R","T","Y","U","I","O","P","A","S","D","F","G","H","J","K","L","Z","X","C","V","B","N","M",]
+    i=0
+    cnt=1 #folosit pentru transformarea propozitiilor atomice P,Q,R...  in P1,P2,...
+    nr_paranteze=0 #contorizam numarul de paranteze din expresie. daca este impar, automat propozitia este gresita
+    while i<len(prop):  #transformarea caracterelor in expresii logice
+   
+        if i+2 < len(prop) and (prop[i]=='A' or prop[i]=='a') and (prop[i+1]=='N' or prop[i]=='n') and (prop[i+2]=='D' or prop[i]=='d'):
+            prop[i]="AND"
+            prop.pop(i+2)   
+            prop.pop(i+1)
+        if i+1 < len(prop) and (prop[i]=='O' or prop[i]=='o') and (prop[i+1]=='R' or prop[i]=='r'):
+            prop[i]="OR"
+            prop.pop(i+1)
+        if i+1 < len(prop) and prop[i]=='=' and prop[i+1]=='>':
+            prop[i]="=>"
+            prop.pop(i+1)
+        if i+2 < len(prop) and prop[i]=='<' and prop[i+1]=='=' and prop[i+2]=='>':
+            prop[i]="<=>"
+            prop.pop(i+2)
+            prop.pop(i+1)
+        if prop[i] in alphabet and len(prop[i])==1:
+            prop[i]='P'
+            prop[i]=prop[i]+str(cnt)
+            cnt+=1
+        if prop[i]=="(" or prop[i]== ")":
+            nr_paranteze+=1
+        i+=1
+    if nr_paranteze%2==1:
+            return False
+    ord_max=0 #in ord_max retinem care este ultimul nivel al grafului, ce e necesar pentru parcurgere
+    P=cnt
+    cnt=0
+    l1=[0]*len(prop) #in l1 e tinut ordinul parantezei, sau pe ce nivel al grafului se afla. necesar pentru verificarea ulterioara a expresiilor
+    for i in range(0,len(prop)):
+        if prop[i]=='(':
+            cnt+=1
+            l1[i]=cnt
+        if prop[i] == ')':
+            l1[i]=cnt
+            cnt-=1
+        if cnt>ord_max:
+            ord_max=cnt
+    semne=["AND","OR","<=>","=>"]
+    while ord_max>=1:   #parcurgerea parantezelor
+        for i in range(0 ,len(l1)-1):
+            if i < len(l1) and l1[i]==ord_max:
+                for j in range(i+1, len(l1),1):
+                    if l1[j]==l1[i]:
+                        if(j-i==4):
+                            if "P" in prop[i+1] and prop[i+2] in semne and "P" in prop[i+3]:
+                                prop.pop(i+4)
+                                prop.pop(i+3)
+                                prop.pop(i+2)
+                                prop.pop(i+1)
+                                l1.pop(i+4)
+                                l1.pop(i+3)
+                                l1.pop(i+2)
+                                l1.pop(i+1)
+                                l1[i]=0
+                                prop[i]="P"+str(P)
+                                P+=1
+                        elif (j-i==3):
+                            if prop[i+1]=="!" and "P" in prop[i+2]:
+                                prop.pop(i+3)
+                                prop.pop(i+2)
+                                prop.pop(i+1)
+                                l1.pop(i+3)
+                                l1.pop(i+2)
+                                l1.pop(i+1)
+                                l1[i]=0
+                                prop[i]="P"+str(P)
+                        else:
+                            return False
+                        break
+        ord_max-=1
+    if(len(l1)==1):
+        return True
+    else:
+        return False
+        
+n=int(input())
+for i in range(1,n):
+    s=input()
+    print(eval_prop(s))
