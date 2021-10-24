@@ -86,8 +86,12 @@ def eval_prop (s):
         return True
     else:
         return False
-        
-n=int(input())
-for i in range(1,n):
-    s=input()
-    print(eval_prop(s))
+print("OR reprezinta conjunctia logica")
+print("AND reprezinta disjunctia logica")
+print("=> reprezinta implicatia logica ")
+print("<=> reprezinta echivalenta logica")
+print("! reprezinta negatia logica")
+print("Propozitiile sunt reprezentate prin litere de tipar")
+print("Propozitia de verificat:",end=" ")
+s=input()
+print (eval_prop(s))
